@@ -1,0 +1,18 @@
+{
+    "total_test_articles": 10,
+    "successfully_extracted": 0,
+    "failed_extractions": 10,
+    "accuracy_percent": 0.0,
+    "failed_urls": [
+        "https://www.economist.com",
+        "https://www.usatoday.com",
+        "https://english.alarabiya.net",
+        "https://www.abc.net.au/news",
+        "https://www.lemonde.fr",
+        "https://www.sputniknews.com",
+        "https://www.jpost.com",
+        "https://www.techradar.com",
+        "https://blog.cloudflare.com",
+        "https://www.theatlantic.com"
+    ]
+}

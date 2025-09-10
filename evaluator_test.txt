@@ -1,0 +1,62 @@
+# evaluate_extractor.py
+import sys
+import json
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'scraper'))
+
+from extractor_super_robust import extract_article, clean_text
+
+
+# ---------------- Paths ----------------
+PREPROCESSED_DIR = 'data/preprocessed/'
+EXTRACTED_DIR = 'data/extracted_multilang/'
+
+PREPROCESSED_TEST = os.path.join(PREPROCESSED_DIR, 'testing_articles.json')
+EXTRACTED_REPORT = os.path.join(EXTRACTED_DIR, 'evaluation_report.json')
+
+# ---------------- Evaluation ----------------
+def evaluate_extractor(input_path):
+    with open(input_path, 'r', encoding='utf-8') as f:
+        articles = json.load(f)
+
+    total = len(articles)
+    successful = 0
+    failed = 0
+    failed_urls = []
+
+    for article in articles:
+        extracted = extract_article(article)
+        if extracted:
+            # We consider extraction successful if both title & body exist and body > 50 words
+            if extracted['title'] and extracted['body'] and len(extracted['body'].split()) >= 50:
+                successful += 1
+            else:
+                failed += 1
+                failed_urls.append(article.get('url'))
+        else:
+            failed += 1
+            failed_urls.append(article.get('url'))
+
+    accuracy = (successful / total) * 100 if total > 0 else 0
+
+    report = {
+        'total_test_articles': total,
+        'successfully_extracted': successful,
+        'failed_extractions': failed,
+        'accuracy_percent': round(accuracy, 2),
+        'failed_urls': failed_urls
+    }
+
+    with open(EXTRACTED_REPORT, 'w', encoding='utf-8') as f:
+        json.dump(report, f, ensure_ascii=False, indent=4)
+
+    print(f"✅ Evaluation complete! Accuracy: {report['accuracy_percent']}%")
+    print(f"⚠️ Failed URLs ({failed}):")
+    for url in failed_urls:
+        print(f"  - {url}")
+
+    return report
+
+# ---------------- Run ----------------
+if __name__ == "__main__":
+    evaluate_extractor(PREPROCESSED_TEST)
